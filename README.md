@@ -7,3 +7,20 @@ _Requires Docker_
 Spin up: 
 ```shell
 docker compose up -d --build
+```
+Take down:
+```shell
+docker compose down -v
+```
+
+### Using Traditional Docker Compose Syntax (Legacy):
+Spin up:
+```shell
+docker compose up -d --build
+```
+Take down:
+```shell
+docker compose down -v
+```
+
+## W N K
