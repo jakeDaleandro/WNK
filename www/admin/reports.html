@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WNK - Reports</title>
+    <script src="../js/admin/reports.js" type="module" defer></script>
+    <link rel="stylesheet" href="../styles/admin.css">
+  </head>
+  <body>
+    <h1>Reports</h1>
+    <button onclick="window.location.href='index.html'">Dashboard</button>
+    <button onclick="window.location.href='/'">Home</button>
+    <button id="logoutBtn">Logout</button>
+    
+    <hr>
+    
+    <h2>Generate Report</h2>
+    <div>
+      <label>Report Type:</label>
+      <select id="reportType">
+        <option value="">Select Report Type</option>
+        <option value="restaurant_activity">Restaurant Annual Activity</option>
+        <option value="customer_purchase">Customer Annual Purchase</option>
+        <option value="needy_receipt">Needy Free Plates Receipt</option>
+        <option value="donor_tax">Donor Year-End Tax Report</option>
+      </select>
+    </div>
+    
+    <div>
+      <label>Year:</label>
+      <select id="reportYear">
+        <option value="2024">2024</option>
+        <option value="2025" selected>2025</option>
+      </select>
+    </div>
+    
+    <div>
+      <label>User ID:</label>
+      <input type="number" id="userId" placeholder="Enter user ID">
+    </div>
+    
+    <button id="generateReportBtn">Generate Report</button>
+    
+    <div id="reportResults">
+      <p>Select report type and enter user ID to generate reports.</p>
+    </div>
+  </body>
+</html>

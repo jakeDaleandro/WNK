@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WNK - Customer Dashboard</title>
+
+    <!-- Link to team shared stylesheet for header and general layout -->
+    <link rel="stylesheet" href="styles/admin.css" />
+
+    <!-- Link to your custom customer stylesheet for buttons -->
+    <link rel="stylesheet" href="styles/customer.css" />
+
+    <!-- Your customer.js module -->
+    <script type="module" src="js/customer.js" defer></script>
+  </head>
+  <body>
+    <!-- Header (matches admin style exactly) -->
+    <div class="admin-header">
+      <h1>Customer Dashboard</h1>
+      <div class="user-info">Welcome, John Customer</div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="admin-nav">
+      <!-- Remove refresh button if not needed -->
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <h2>Available Plates</h2>
+      <div id="platesList"></div>
+
+      <h3>My Active Orders</h3>
+      <div id="myOrders"></div>
+
+      <h3>Past Orders</h3>
+      <div id="pastOrders"></div>
+    </div>
+  </body>
+</html>

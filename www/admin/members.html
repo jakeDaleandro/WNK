@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WNK - Member Management</title>
+    <script src="../js/admin/members.js" type="module" defer></script>
+    <link rel="stylesheet" href="../styles/admin.css">
+  </head>
+  <body>
+    <h1>Member Management</h1>
+    <button onclick="window.location.href='index.html'">Dashboard</button>
+    <button onclick="window.location.href='/'">Home</button>
+    <button id="logoutBtn">Logout</button>
+    
+    <hr>
+    
+    <h2>Search Members</h2>
+    <input type="text" id="searchInput" placeholder="Search by name, username, or address">
+    <select id="roleFilter">
+      <option value="all">All Roles</option>
+      <option value="restaurant">Restaurant</option>
+      <option value="customer">Customer</option>
+      <option value="donor">Donor</option>
+      <option value="needy">Needy</option>
+    </select>
+    <button id="searchBtn">Search</button>
+    
+    <div id="membersResults">
+      <p>Use the search form above to find members.</p>
+    </div>
+  </body>
+</html>

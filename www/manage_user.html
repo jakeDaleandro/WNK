@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WNK - Manage User</title>
+    <script src="js/manage_user.js" , type="module" defer></script>
+  </head>
+  <body>
+    <h1>User Profile</h1>
+    <button onclick="window.location.href='/'">Home</button>
+    <button id="logoutBtn">Logout</button>
+    <hr />
+
+    <form id="profileForm">
+      <label>Role:</label>
+      <input type="text" name="role" id="roleField" disabled /><br />
+
+      <label>Name:</label>
+      <input type="text" name="name" required /><br />
+
+      <label>Address:</label>
+      <input type="text" name="address" required /><br />
+
+      <label>Phone:</label>
+      <input type="text" name="phone" id="phoneField" /><br />
+
+      <label>Username:</label>
+      <input type="text" name="username" disabled /><br />
+
+      <label>New Password:</label>
+      <input type="password" name="password" /><br />
+
+      <div id="paymentFields" style="display: none">
+        <h3>Payment Info</h3>
+        <label>Card Number:</label>
+        <input type="text" name="cc_number" /><br />
+
+        <label>Exp Month:</label>
+        <input type="number" name="cc_exp_month" /><br />
+
+        <label>Exp Year:</label>
+        <input type="number" name="cc_exp_year" /><br />
+
+        <label>CVV:</label>
+        <input type="text" name="cc_cvv" /><br />
+      </div>
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </body>
+</html>

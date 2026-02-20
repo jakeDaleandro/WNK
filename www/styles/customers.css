@@ -1,0 +1,41 @@
+/* Customer Dashboard buttons - overrides admin.css */
+.admin-nav button,
+.content button,
+button {
+    background: #e0e0e0 !important; /* light grey */
+    color: #000 !important;         /* black text */
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.admin-nav button:hover,
+.content button:hover,
+button:hover {
+    background: #d5d5d5 !important; /* slightly darker on hover */
+}
+
+/* Cancel Button */
+button.cancel-btn {
+    color: #e74c3c !important; /* red text */
+    background: #f0f0f0 !important;
+}
+
+button.cancel-btn:hover {
+    background: #e6e6e6 !important;
+}
+
+/* Plus/Minus Quantity Buttons */
+button.qty-btn {
+    background: #f0f0f0 !important;
+    color: #000 !important;
+    padding: 5px 10px;
+    font-size: 13px;
+}
+
+button.qty-btn:hover {
+    background: #e6e6e6 !important;
+}

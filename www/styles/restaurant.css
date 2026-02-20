@@ -1,0 +1,11 @@
+table,
+table th,
+table td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}

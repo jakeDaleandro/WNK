@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Waste Not Kitchen</title>
+    <script src="js/index.js" type="module" defer></script>
+  </head>
+  <body>
+    <h1>Waste Not Kitchen</h1>
+    <hr />
+    <h2>Home</h2>
+    <p>COP4710 Project Group 8</p>
+    <div id="loggedOutUI">
+      <button onclick="window.location.href='login.html'">Login</button>
+      <button onclick="window.location.href='register.html'">Register</button>
+    </div>
+    <div id="loggedInUI">
+      <p id="welcomeMsg"></p>
+      <button id="viewRolePageBtn"></button>
+      <br />
+      <button onclick="window.location.href='/manage_user.html'">
+        Edit Information
+      </button>
+      <br />
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </body>
+</html>

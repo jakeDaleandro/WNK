@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WNK - Restaurant</title>
+    <link href="styles/restaurant.css" rel="stylesheet" />
+    <script src="js/restaurant.js" type="module" defer></script>
+  </head>
+  <body>
+    <h1>Waste Not Kitchen</h1>
+    <hr />
+    <h2>Restaurant View</h2>
+    <button onclick="window.location.href='/'">Home</button>
+    <button id="logoutBtn">Logout</button>
+    <h3>List a Plate</h3>
+    <form id="listPlateForm">
+      <label>Description: </label>
+      <input type="text" name="description" /> <br />
+      <label>Price: </label>
+      <input type="text" name="price" /> <br />
+      <label>Quantity: </label>
+      <input type="text" name="quantity" /> <br />
+      <label>End Time: </label>
+      <input type="date" name="endDate" />
+      <input type="time" name="endTime" />
+      <br /><br />
+      <button type="submit">Submit</button>
+    </form>
+    <h3>Listed Plates</h3>
+    <table id="availablePlatesTbl">
+      <tr>
+        <th>Plate ID</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>End Time</th>
+      </tr>
+    </table>
+
+    <h3>Orders</h3>
+    <table id="ordersTbl">
+      <tr>
+        <th>Order ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Description</th>
+        <th>Purchased By</th>
+        <th>Pickup Name</th>
+      </tr>
+    </table>
+  </body>
+</html>
