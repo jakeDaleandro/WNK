@@ -1,0 +1,209 @@
+rules_version = '2';
+
+// Waste Not Kitchen — Firestore security rules
+//
+// Model: clients may read what they own or are entitled to see, and may write
+// only their own profile and (for restaurants) their own plate listings.
+// Everything that moves money, inventory, or pickup state goes through Cloud
+// Functions (Admin SDK), so orders, meals and stats are never client-writable.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function profilePath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function profile() {
+      return get(profilePath()).data;
+    }
+
+    function isActive() {
+      return signedIn() && exists(profilePath()) && profile().status == 'active';
+    }
+
+    function hasRole(role) {
+      return isActive() && profile().role == role;
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    function isString(v, min, max) {
+      return v is string && v.size() >= min && v.size() <= max;
+    }
+
+    function optionalString(data, key, max) {
+      return !(key in data) || data[key] == null || isString(data[key], 0, max);
+    }
+
+    // Payment details are a display-only snapshot. Full card numbers and CVVs
+    // are never accepted by the database.
+    function validPayment(p) {
+      return p is map
+        && p.keys().hasOnly(['brand', 'last4', 'expMonth', 'expYear', 'holder'])
+        && p.keys().hasAll(['brand', 'last4', 'expMonth', 'expYear', 'holder'])
+        && p.brand in ['visa', 'mastercard', 'amex', 'discover', 'card']
+        && p.last4 is string && p.last4.matches('^[0-9]{4}$')
+        && p.expMonth is int && p.expMonth >= 1 && p.expMonth <= 12
+        && p.expYear is int && p.expYear >= 2024 && p.expYear <= 2100
+        && isString(p.holder, 1, 80);
+    }
+
+    function validRestaurantInfo(r) {
+      return r is map
+        && r.keys().hasOnly(['cuisine', 'description', 'hours'])
+        && optionalString(r, 'cuisine', 40)
+        && optionalString(r, 'description', 400)
+        && optionalString(r, 'hours', 80);
+    }
+
+    function validProfile(d) {
+      return d.keys().hasOnly([
+          'role', 'name', 'email', 'phone', 'address', 'status',
+          'payment', 'restaurant', 'createdAt', 'updatedAt'
+        ])
+        && d.keys().hasAll(['role', 'name', 'email', 'address', 'status', 'createdAt'])
+        && isString(d.name, 2, 80)
+        && isString(d.address, 5, 200)
+        && (
+          d.role == 'needy'
+            ? (!('phone' in d) || d.phone == null || isString(d.phone, 0, 30))
+            : isString(d.phone, 7, 30)
+        )
+        && (
+          d.role in ['customer', 'donor']
+            ? ('payment' in d && validPayment(d.payment))
+            : !('payment' in d)
+        )
+        && (
+          d.role == 'restaurant'
+            ? (!('restaurant' in d) || validRestaurantInfo(d.restaurant))
+            : !('restaurant' in d)
+        );
+    }
+
+    // ---------- users ----------
+
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+
+      // Self sign-up. Admin is never self-assignable; status always starts active.
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.role in ['restaurant', 'customer', 'donor', 'needy']
+        && request.resource.data.status == 'active'
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt == request.time
+        && validProfile(request.resource.data);
+
+      // Self-service profile edits. Role, status, email and createdAt are immutable
+      // here — role/status changes go through the admin Cloud Functions.
+      allow update: if isActive()
+        && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['name', 'phone', 'address', 'payment', 'restaurant', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && validProfile(request.resource.data);
+
+      allow delete: if false;
+    }
+
+    // ---------- plates (restaurant listings) ----------
+
+    function validPlate(d) {
+      return d.keys().hasOnly([
+          'restaurantId', 'restaurantName', 'restaurantAddress',
+          'title', 'description', 'category', 'dietary',
+          'price', 'originalPrice', 'quantity', 'reserved',
+          'expiresAt', 'status', 'createdAt', 'updatedAt'
+        ])
+        && isString(d.title, 3, 80)
+        && isString(d.description, 0, 500)
+        && d.category in ['entree', 'bakery', 'produce', 'dessert', 'mealkit', 'beverage', 'other']
+        && d.dietary is list && d.dietary.size() <= 6
+        && d.dietary.hasOnly(['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal'])
+        && d.price is number && d.price >= 0 && d.price <= 500
+        && (d.originalPrice == null || (d.originalPrice is number && d.originalPrice >= d.price && d.originalPrice <= 1000))
+        && d.quantity is int && d.quantity >= 1 && d.quantity <= 500
+        && d.reserved is int && d.reserved >= 0 && d.reserved <= d.quantity
+        && d.expiresAt is timestamp
+        && d.status in ['active', 'withdrawn'];
+    }
+
+    match /plates/{plateId} {
+      allow read: if isActive();
+
+      allow create: if hasRole('restaurant')
+        && request.resource.data.restaurantId == request.auth.uid
+        && request.resource.data.restaurantName == profile().name
+        && request.resource.data.restaurantAddress == profile().address
+        && request.resource.data.reserved == 0
+        && request.resource.data.status == 'active'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt < request.time + duration.value(7, 'd')
+        && validPlate(request.resource.data);
+
+      // Owners may edit listing details; `reserved` is maintained only by Cloud
+      // Functions, and quantity can never drop below what's already been sold.
+      allow update: if hasRole('restaurant')
+        && resource.data.restaurantId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['title', 'description', 'category', 'dietary', 'price',
+                       'originalPrice', 'quantity', 'expiresAt', 'status', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.quantity >= resource.data.reserved
+        && validPlate(request.resource.data);
+
+      // Unsold listings can be deleted outright; anything with sales is withdrawn instead.
+      allow delete: if hasRole('restaurant')
+        && resource.data.restaurantId == request.auth.uid
+        && resource.data.reserved == 0;
+    }
+
+    // ---------- orders (purchases + donations) — server-written only ----------
+
+    match /orders/{orderId} {
+      allow read: if isActive() && (
+        resource.data.userId == request.auth.uid
+        || resource.data.restaurantId == request.auth.uid
+        || isAdmin()
+      );
+      allow write: if false;
+    }
+
+    // ---------- meals (individual donated meals) — server-written only ----------
+
+    match /meals/{mealId} {
+      allow read: if isActive() && (
+        isAdmin()
+        || resource.data.donorId == request.auth.uid
+        || resource.data.restaurantId == request.auth.uid
+        || resource.data.claimedBy == request.auth.uid
+        || (profile().role == 'needy' && resource.data.status == 'available')
+      );
+      allow write: if false;
+    }
+
+    // ---------- public impact counters ----------
+
+    match /stats/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Deny everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

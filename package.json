@@ -1,0 +1,43 @@
+{
+  "name": "waste-not-kitchen",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "emulators": "firebase emulators:start",
+    "seed": "node scripts/seed.mjs",
+    "test:rules": "firebase emulators:exec --only firestore \"vitest run tests/rules.test.ts\"",
+    "test:functions": "npm --prefix functions run build && firebase emulators:exec --only auth,firestore,functions \"vitest run tests/functions.test.ts\"",
+    "test": "npm run test:rules && npm run test:functions",
+    "deploy": "npm run build && firebase deploy"
+  },
+  "dependencies": {
+    "firebase": "^12.19.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "lucide-react": "^1.48.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4",
+    "recharts": "^3.10.1",
+    "sonner": "^2.0.8",
+    "clsx": "^2.1.1"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "firebase-admin": "^13.6.0",
+    "firebase-tools": "^15.31.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.1"
+  }
+}
